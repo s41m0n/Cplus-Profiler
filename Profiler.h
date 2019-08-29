@@ -24,12 +24,12 @@
 #endif
 
 /***
- * Benchmarker class to measure execution time of certain functions
+ * Benchmarker Singleton class to measure execution time of certain functions
  */
 class Profiler {
 
 private:
-    ///private Class constructor to avoid instantiation, includes a warm-up phase for the timer and cache loading
+    ///Private class constructor to avoid instantiation, includes a warm-up phase for the timer and cache loading
     Profiler();
 
     ///Support data structure
@@ -38,11 +38,11 @@ private:
 public:
     /**
      * Function to be called before the `objective function` execution to store the initial timestamp
-     * @param request => the name of the function to be measured
+     * @param request : checkpoint name
      */
     void tick(const std::string &checkpoint = "");
 
-    ///Function called to store the gathered data into a file
+    ///Function called to store gathered data into a file
     void store();
 
     ///Singleton implementation, method to return the instance
