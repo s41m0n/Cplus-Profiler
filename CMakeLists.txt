@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
-project(profiler)
+project(Cplus-Profiler)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(profiler main.cpp)
+add_executable(Cplus-Profiler main.cpp)
