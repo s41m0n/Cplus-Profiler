@@ -6,9 +6,9 @@ int main(int argc, char **argv) {
 
   //Benchmarking
   for(int i=0; i<N_ITER; i++) {
-    CHECKPOINT("A");
+    CHECKPOINT("A")
   }
-  ENDPOINT("A");
+  ENDPOINT("A")
 
   return 0;
 }
