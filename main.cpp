@@ -7,7 +7,7 @@
 int main(int argc, char **argv) {
 
   //Benchmarking
-  for(int i=0; i<N_ITER; i++) {
+  for(auto i=0; i<N_ITER; i++) {
     CHECKPOINT(i)
   }
   STOREPOINT(N_ITER)
