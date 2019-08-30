@@ -2,7 +2,7 @@ import sys
 import re
 
 checkpoints = []
-timestamps = []
+duration = []
 pattern = '(.*):(\\d+)'
 
 if len(sys.argv) == 1 or '.txt' not in sys.argv[1]:
@@ -26,15 +26,17 @@ def readFile(filename):
       if first is True:
         first = False
       else:
-        checkpoints.append(match.group(1))
-        timestamps.append(int(match.group(2)) - previous)
+        duration.append(int(match.group(2)) - previous)
+      checkpoints.append(match.group(1))
       previous = int(match.group(2))
 
 def main():
   readFile(sys.argv[1])
-  print("Max execution time: " + str(max(timestamps)))
-  print("Min execution time: " + str(min(timestamps)))
-  print("Avg execution time: " + str(sum(timestamps)/len(timestamps)))
+  print("Max execution time: " + str(max(duration)))
+  print("Min execution time: " + str(min(duration)))
+  print("Avg execution time: " + str(sum(duration)/len(duration)))
+  for count, item in enumerate(checkpoints[:-1]):
+    print(item + "=>" + checkpoints[count+1] + ": " + str(duration[count]) + " ns")
 
 if __name__== '__main__':
   main()
