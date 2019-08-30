@@ -23,4 +23,20 @@ ENDPOINT("C")
 ...
 ```
 
-Since the stored timestamps refer to the start of the epoch, to beautify the data and print some statistics the user can use `compute.py <result_file_name>`.
+Example of `result.txt`:
+
+```txt
+'A':1567157376902525016
+'B':1567157376902525111
+'C':1567157376902525272
+```
+
+Since the stored timestamps refer to the start of the epoch, to beautify the data and print some statistics the user can use `compute.py <result_file_name>` to achieve the following result:
+
+```python
+Max execution time: 161
+Min execution time: 95
+Avg execution time: 128.0
+'A'=>'B': 95 ns
+'B'=>'C': 161 ns
+```
