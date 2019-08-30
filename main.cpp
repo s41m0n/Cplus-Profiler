@@ -8,9 +8,9 @@ int main(int argc, char **argv) {
 
   //Benchmarking
   for(auto i=0; i<N_ITER; i++) {
-    CHECKPOINT(i)
+    CHECKPOINT
   }
-  STOREPOINT(N_ITER)
 
+  STOREPOINT
   return 0;
 }
