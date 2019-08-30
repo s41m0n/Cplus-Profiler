@@ -15,6 +15,7 @@ def readFile(filename):
     exit()
   first = True
   previous = 0
+  counter = 1
   for line in lines:
     match = re.match(pattern, line, flags=0)
     # Ha matchato l'inizio del benchmark
@@ -23,11 +24,20 @@ def readFile(filename):
         first = False
       else:
         duration.append(int(match.group(2)) - previous)
-      checkpoints.append(match.group(1))
+      newCheckpoint = match.group(1)[match.group(1).rfind('/')+1:]
+      #Loop detector
+      if len(checkpoints) != 0 and newCheckpoint == checkpoints[-1][:len(newCheckpoint)]:
+        newCheckpoint += ", " + str(counter)
+        counter += 1
+      else:
+        counter = 1
+        newCheckpoint += ", 0"
+      checkpoints.append(newCheckpoint)
       previous = int(match.group(2))
     else:
       print('File badly formatted (\'<CHECKPOINTNAME>\':<timestamp>)')
       exit()
+
 
 def showUsage():
   print("compute.py <filename>")
@@ -45,7 +55,7 @@ def main():
   print("Avg execution time: " + str(sum(duration)/len(duration)))
   if len(sys.argv) >= 3 and sys.argv[2] == "--show-each":
     for count, item in enumerate(checkpoints[:-1]):
-      print(item + "=>" + checkpoints[count+1] + ": " + str(duration[count]) + " ns")
+      print("Checkpoint(" + item + ") to Checkpoint(" + checkpoints[count+1] + "): " + str(duration[count]) + " ns")
 
 if __name__== '__main__':
   main()
