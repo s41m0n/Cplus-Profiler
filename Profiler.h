@@ -17,14 +17,14 @@
 
 #ifdef PROFILER
 #define CHECKPOINT(X) Profiler::getInstance().tick(X);
-#define ENDPOINT(X) {CHECKPOINT(X); Profiler::getInstance().store();}
+#define ENDPOINT(X) {CHECKPOINT(X) Profiler::getInstance().store();}
 #else
 #define CHECKPOINT(X)
 #define ENDPOINT(X)
 #endif
 
 /***
- * Benchmarker Singleton class to measure execution time of certain functions
+ * Profiler Singleton class to measure execution time of certain functions
  */
 class Profiler {
 
@@ -45,11 +45,14 @@ public:
     ///Function called to store gathered data into a file
     void store();
 
+#ifdef PROFILER
     ///Singleton implementation, method to return the instance
     static Profiler &getInstance() {
       static Profiler instance;
       return instance;
     }
+
+#endif
 };
 
 inline Profiler::Profiler() {
