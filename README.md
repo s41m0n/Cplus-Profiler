@@ -1,26 +1,59 @@
 # Cplus-Profiler
-Simple, easy to use and fast C++ class for profiling and benchmark
+Simple, easy to use and fast C++ header class for profiling and benchmark
 
 Author: Simone Magnani - s41m0n
 
+## Introduction
+
+## How it works
+
+The framework defines two different main components:
+
+* Check-point: `CHECKPOINT`
+* Store-point: `STOREPOINT`
+
+A check-point is a point of the code where we simply want to take a measure (timestamp).
+A store-point is a specialized check-point which not only acts like it, but it also manage the data storing into a file.
+
+While the usage of a check-point leads to a negligible overhead(\~60 nanoseconds), it is suggested to wisely use especially the store-points, since the I/O operation on file are more expensive.
+
+Every measure is characterized by the identifier:
+
+* filename
+* line of code
+* timestamp (nanoseconds)
+
+Thanks to this implementation, the user is not required to name each capture point, since they are clear enough.
+
 ## Usage
 
-In order to gather data, the user is required to insert the macro `CHECKPOINT(<NAME>)` in all the code fragments he wants to measure the execution time.
+To insert these points into the code, the user have just to insert their specific MACRO.
+To remove them, comment the line or remove it.
 
-Once established all the capture points, the macro `ENDPOINT(<NAME>)` not only performs the last measurement, but it also stores the gathered data into a simple file.
+In order to gather data, the user is required to insert the macro `CHECKPOINT` in all the code fragments he wants to get the timestamp.
+
+Once decided the place where the user want to permanently save the retrieved data into a file, insert the macro `STOREPOINT`. 
+
+
+## Example 
 
 ```c++
-...
-CHECKPOINT("A")
+#define PROFILER
 
-someFunctions();
+#include "Profiler.h"
 
-CHECKPOINT("B")
+#define N_ITER 100
 
-otherFunctions();
+int main(int argc, char **argv) {
 
-ENDPOINT("C")
-...
+  //Benchmarking
+  for(auto i=0; i<N_ITER; i++) {
+    CHECKPOINT
+  }
+
+  STOREPOINT
+  return 0;
+}
 ```
 
 Example of `result.txt`:
@@ -39,4 +72,13 @@ Min execution time: 95
 Avg execution time: 128.0
 'A'=>'B': 95 ns
 'B'=>'C': 161 ns
+```
+
+## Performance analysis
+
+
+```
+1) Add a brief section to the idea behind checkpoints (so, how this feature should be used, to do what). ALso specify the difference between this and "perf" in Linux.
+2) Add some performance numbers, as I feel somebody may be upset to see so much C++ code (and classes), unless you show that the overhead is so tiny.
+Btw, it is not clear how the overhead increases if we have more checkpoints (do we have to operate on string; are these operations costly if we have so many strings?) (edited) 
 ```
