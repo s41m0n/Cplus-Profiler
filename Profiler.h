@@ -5,26 +5,23 @@
 #define __PROFILER__
 
 #include <vector>
-#include <string>
 #include <chrono>
 #include <algorithm>
 #include <fstream>
 
-#define WARM_UP 1000
-#define OUTPUT_FILE "../result.txt"
-
-#define PROFILER
+#define WARM_UP 100
+#define OUTPUT_FILE "profiler_result.txt"
 
 #ifdef PROFILER
 #define CHECKPOINT(X) Profiler::getInstance().tick(X);
-#define ENDPOINT(X) {CHECKPOINT(X) Profiler::getInstance().store();}
+#define STOREPOINT(X) {CHECKPOINT(X) Profiler::getInstance().store();}
 #else
 #define CHECKPOINT(X)
-#define ENDPOINT(X)
+#define STOREPOINT(X)
 #endif
 
 /***
- * Profiler Singleton class to measure execution time of certain functions
+ * Profiler Singleton header class to measure execution time of certain functions
  */
 class Profiler {
 
@@ -33,14 +30,14 @@ private:
     Profiler();
 
     ///Support data structure
-    std::vector<std::pair<std::string, std::chrono::high_resolution_clock::time_point>> results;
+    std::vector<std::pair<unsigned int, std::chrono::high_resolution_clock::time_point>> results;
 
 public:
     /**
      * Function to be called before the `objective function` execution to store the initial timestamp
-     * @param request : checkpoint name
+     * @param request : checkpoint number
      */
-    void tick(const std::string &checkpoint = "");
+    void tick(unsigned int checkpoint_number = 0);
 
     ///Function called to store gathered data into a file
     void store();
@@ -72,9 +69,8 @@ inline void Profiler::store() {
   results.clear();
 }
 
-inline void Profiler::tick(const std::string &checkpoint) {
-  results.emplace_back(std::pair<std::string, std::chrono::high_resolution_clock::time_point>(checkpoint,
-                                                                                              std::chrono::high_resolution_clock::now()));
+inline void Profiler::tick(unsigned int checkpoint_number) {
+  results.emplace_back(std::make_pair(checkpoint_number, std::chrono::high_resolution_clock::now()));
 }
 
 
