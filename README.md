@@ -1,4 +1,5 @@
 
+
 # Cplus-Profiler
 Simple, easy to use and fast C++ header class for profiling and benchmark.
 
@@ -36,12 +37,12 @@ Accordingly, the format used to store check-points is: `<filename>,<line_of_code
 
 The framework is activated by defining `#define PROFILER` in your code (wherever the user wants) but **before** the library inclusion. Without this definition, the framework will be automatically turned off for all the execution.
 
-To insert Check-points, the user have just to insert the MACRO `CHECKPOINT`.
-To insert Store-points, insert the MACRO `STOREPOINT`.
+Possible operations:
+* to insert Check-points, the user have just to insert the MACRO `CHECKPOINT`.
+* to insert Store-points, insert the MACRO `STOREPOINT`.
+* to remove them, comment the apposite line or remove it.
 
-To remove them, comment the apposite line or remove it.
-
-An interesting feature is that in case the user deactivates it, he is not required to remove every checkpoints he had previously inserted in the code: the framework will handle it by replacing them with an empty line!
+An interesting feature is that in case the user deactivates the framework, it is not required to remove every checkpoints he had previously inserted in the code: the framework will handle it by replacing them with an empty line!
 
 ## Example 
 
