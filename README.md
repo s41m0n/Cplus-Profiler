@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
   CHECKPOINT 				//line 7
   computeSquare(1);
-  CHECKPOINT   				//line 9
+  CHECKPOINT   			//line 9
   computeSquare(2);
   STOREPOINT 				//line 11
   return 0;
