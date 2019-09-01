@@ -59,8 +59,7 @@ inline void Profiler::store() {
   std::ofstream outputFile;
   outputFile.open(OUTPUT_FILE, std::ios::out);
   std::for_each(results.begin(), results.end(), [this, &outputFile](auto &res) -> void {
-      outputFile << "" << res.first.first << ", " << res.first.second << ":" << res.second.time_since_epoch().count()
-                 << std::endl;
+      outputFile << res.first.first << "," << res.first.second << ":" << res.second.time_since_epoch().count() << std::endl;
   });
   outputFile.close();
   results.clear();
