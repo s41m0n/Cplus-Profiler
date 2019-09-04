@@ -1,5 +1,3 @@
-
-
 # Cplus-Profiler
 Simple, easy to use and fast C++ header class for profiling and benchmark.
 
@@ -25,7 +23,7 @@ A store-point is a specialized check-point which not only acts like it, but it a
 
 While the usage of a check-point leads to a negligible overhead (\~60 nanoseconds), it is suggested to use wisely the store-points, since the I/O operation on file are more expensive.
 
-Every measure is characterized by:
+Each measure is characterized by:
 
 * filename: the name of the file which contains the check-point;
 * line of code: the line of code where the check-point has been inserted;
