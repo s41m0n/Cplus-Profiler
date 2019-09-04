@@ -3,4 +3,4 @@ project(Cplus-Profiler)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Cplus-Profiler main.cpp)
+add_executable(Cplus-Profiler main.cpp Profiler.cpp)

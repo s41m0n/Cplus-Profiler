@@ -1,7 +1,6 @@
 //
 // Created by s41m0n on 30/07/19.
 //
-#ifdef PROFILER
 
 #ifndef __PROFILER__
 #define __PROFILER__
@@ -48,34 +47,4 @@ public:
     }
 };
 
-inline Profiler::Profiler() {
-  for (int i = 0; i < WARM_UP; i++) {
-    tick();
-  }
-  results.clear();
-}
-
-inline void Profiler::store() {
-  std::ofstream outputFile;
-  outputFile.open(OUTPUT_FILE, std::ios::out);
-  std::for_each(results.begin(), results.end(), [this, &outputFile](auto &res) -> void {
-      outputFile << res.first.first << "," << res.first.second << ":" << res.second.time_since_epoch().count() << std::endl;
-  });
-  outputFile.close();
-  results.clear();
-}
-
-inline void Profiler::tick(const char *filename, unsigned line_number) {
-  results.emplace_back(
-          std::make_pair(std::make_pair(filename, line_number), std::chrono::high_resolution_clock::now()));
-}
-
-
 #endif //__PROFILER__
-
-#else
-
-#define CHECKPOINT
-#define STOREPOINT
-
-#endif //PROFILER
