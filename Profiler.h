@@ -10,6 +10,7 @@
 #include <chrono>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 
 #define WARM_UP 100
 #define OUTPUT_FILE "profiler_result.txt"
@@ -49,6 +50,7 @@ public:
 };
 
 inline Profiler::Profiler() {
+  remove(OUTPUT_FILE);
   for (int i = 0; i < WARM_UP; i++) {
     tick();
   }
