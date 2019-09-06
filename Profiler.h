@@ -64,13 +64,13 @@ inline Profiler::Profiler() {
   auto ltm = localtime(&now);
 
   output_file = dynamic_cast<std::ostringstream &>(std::ostringstream().seekp(0)
-          << PROFILER_FILENAME << "(" << std::setw(4)
+          << PROFILER_FILENAME << "_" << std::setw(4)
           << 1900 + ltm->tm_year << std::setfill('0') << std::setw(2)
           << ltm->tm_mon << std::setfill('0') << std::setw(2)
           << ltm->tm_mday << "_" << std::setfill('0') << std::setw(2)
           << ltm->tm_hour << std::setfill('0') << std::setw(2)
           <<ltm->tm_min << std::setfill('0') << std::setw(2)
-          << ltm->tm_sec << ")" << PROFILER_EXTENSION).str();
+          << ltm->tm_sec << PROFILER_EXTENSION).str();
 
   for (int i = 0; i < WARM_UP; i++) {
     tick();
