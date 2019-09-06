@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-After the execution, we obtain the following `profile(Sep  2 2019,18:18:47)` file:
+After the execution, we obtain the following `profile(Sep  2 2019,18:18:47).txt` file:
 
 ```txt
 main.cpp,7:1567333232104876595
@@ -73,7 +73,7 @@ main.cpp,11:1567333232104876737
 Since the stored timestamps refer to the start of the epoch, to beautify the data and print some statistics we use our script `compute.py`:
 
 ```bash
-$ python compute.py profiler_result.txt --show-all
+$ python compute.py profile(Sep  2 2019,18:18:47).txt --show-all
 
 Checkpoint(main.cpp,7,0) to Checkpoint(main.cpp,9,0): 71 ns
 Checkpoint(main.cpp,9,0) to Checkpoint(main.cpp,11,0): 71 ns

@@ -6,6 +6,7 @@
 #ifndef __PROFILER__
 #define __PROFILER__
 
+
 #include <vector>
 #include <chrono>
 #include <algorithm>
@@ -13,7 +14,9 @@
 
 #define WARM_UP 100
 
-#define OUTPUT_FILE "profile(" __DATE__ "," __TIME__ ").txt"
+#define PROFILER_FILENAME "profile"
+#define PROFILER_EXTENSION ".txt"
+
 
 #define CHECKPOINT Profiler::getInstance().tick(__FILE__, __LINE__);
 #define STOREPOINT {CHECKPOINT Profiler::getInstance().store();}
@@ -30,6 +33,9 @@ private:
 
     ///Support data structure
     std::vector<std::pair<std::pair<const char *, unsigned>, std::chrono::high_resolution_clock::time_point>> results;
+
+    ///Final filename calculate at execution time
+    std::string output_file;
 
 public:
     /**
@@ -50,6 +56,14 @@ public:
 };
 
 inline Profiler::Profiler() {
+  auto date = std::chrono::high_resolution_clock::to_time_t(
+          std::chrono::system_clock::now());
+
+  output_file = dynamic_cast<std::ostringstream &>(std::ostringstream().seekp(0)
+          << PROFILER_FILENAME << "("
+          << std::ctime(&date) << ")"
+          << PROFILER_EXTENSION).str();
+
   for (int i = 0; i < WARM_UP; i++) {
     tick();
   }
@@ -58,7 +72,7 @@ inline Profiler::Profiler() {
 
 inline void Profiler::store() {
   std::ofstream outputFile;
-  outputFile.open(OUTPUT_FILE, std::ios::app);
+  outputFile.open(output_file, std::ios::app);
   std::for_each(results.begin(), results.end(), [this, &outputFile](auto &res) -> void {
       outputFile << res.first.first << "," << res.first.second << ":" << res.second.time_since_epoch().count() << std::endl;
   });
