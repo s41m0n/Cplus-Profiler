@@ -7,15 +7,19 @@
 #define __PROFILER__
 
 
+#include <iomanip>
+#include <sstream>
+#include <string>
 #include <vector>
 #include <chrono>
 #include <algorithm>
 #include <fstream>
+#include <ctime>
 
 #define WARM_UP 100
 
 #define PROFILER_FILENAME "profile"
-#define PROFILER_EXTENSION ".txt"
+#define PROFILER_EXTENSION ".log"
 
 
 #define CHECKPOINT Profiler::getInstance().tick(__FILE__, __LINE__);
@@ -56,13 +60,17 @@ public:
 };
 
 inline Profiler::Profiler() {
-  auto date = std::chrono::high_resolution_clock::to_time_t(
-          std::chrono::system_clock::now());
+  auto now = time(nullptr);
+  auto ltm = localtime(&now);
 
   output_file = dynamic_cast<std::ostringstream &>(std::ostringstream().seekp(0)
-          << PROFILER_FILENAME << "("
-          << std::ctime(&date) << ")"
-          << PROFILER_EXTENSION).str();
+          << PROFILER_FILENAME << "(" << std::setw(4)
+          << 1900 + ltm->tm_year << std::setfill('0') << std::setw(2)
+          << ltm->tm_mon << std::setfill('0') << std::setw(2)
+          << ltm->tm_mday << "_" << std::setfill('0') << std::setw(2)
+          << ltm->tm_hour << std::setfill('0') << std::setw(2)
+          <<ltm->tm_min << std::setfill('0') << std::setw(2)
+          << ltm->tm_sec << ")" << PROFILER_EXTENSION).str();
 
   for (int i = 0; i < WARM_UP; i++) {
     tick();
