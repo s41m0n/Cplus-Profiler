@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-After the execution, we obtain the following `profiler_result.txt` file:
+After the execution, we obtain the following `profile(Sep  2 2019,18:18:47)` file:
 
 ```txt
 main.cpp,7:1567333232104876595
