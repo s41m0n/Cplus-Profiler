@@ -10,10 +10,10 @@
 #include <chrono>
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 
 #define WARM_UP 100
-#define OUTPUT_FILE "profiler_result.txt"
+
+#define OUTPUT_FILE "profile(" __DATE__ "," __TIME__ ").txt"
 
 #define CHECKPOINT Profiler::getInstance().tick(__FILE__, __LINE__);
 #define STOREPOINT {CHECKPOINT Profiler::getInstance().store();}
@@ -50,7 +50,6 @@ public:
 };
 
 inline Profiler::Profiler() {
-  remove(OUTPUT_FILE);
   for (int i = 0; i < WARM_UP; i++) {
     tick();
   }
