@@ -6,10 +6,10 @@
 int main(int argc, char **argv) {
 
   for(auto i=0; i<N_ITER; i++) {
-    CHECKPOINT
+    CHECKPOINT("asd")
   }
 
-  STOREPOINT
+  STOREPOINT("END")
 
   return 0;
 }

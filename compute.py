@@ -8,39 +8,41 @@ information previously gathered by the framework.
 
 Usage: profiler_parse.py <filename> [<FLAGS>]
     -h/--help: show the usage menu
-    -s/--show-all: show duration between checkpoints
+    -s/--statistics: show only general statistics
+    -e/--export: export in csv format
 """
 
 import sys
 import re
+import csv
 
-#Support variables
-previousTimestamp = 0
-identifiers = []
-checkpoints = []
-duration = []
-#Pattern to match. The framework's output file is: 
+#Support variable
+data = []
+previous = 0
+padding = 40
+
+#Pattern to match. The framework's output file is:
 #<filename>,<line_of_code>:<timestamp>
-pattern = '(\\S+),(\\d+):(\\d+)'
+pattern = '(\\S+),(\\d+),(.*),(\\d+)'
 
 #Function to parse a matched line
 def parseMatch(match, number):
-  global previousTimestamp, identifiers, checkpoints, duration
+  global data, padding, previous
   #Used last string from '/' since the __FILE__ macro in C
   #could contain the entire path
-  checkpointName = match.group(1)[match.group(1).rfind('/')+1:] + ',' + match.group(2)
-  timestamp = int(match.group(3))
-  #Skip the first Checkpoint since duration would be meaningless (=0)
-  if number != 0:
-    duration.append(timestamp - previousTimestamp)
-  identifiers.append(checkpoints.count(checkpointName))
-  checkpoints.append(checkpointName)
-  previousTimestamp = timestamp
+  file = match.group(1)[match.group(1).rfind('/')+1:]
+  line = int(match.group(2))
+  name = match.group(3)
+  loopId = len([1 for x in data if x[0] == file and x[1] == line])
+  timestamp = int(match.group(4))
+  duration = 0 if number == 0 else timestamp - previous
+  previous = timestamp
+  padding = padding if len(file)+len(str(line))+1 < padding else len(file)+len(str(line))+1
+  padding = padding if len(name) < padding else len(name)
+  data.append((file,line,name,loopId,timestamp,duration))
 
 #Function to read the specified file
 def readFile(filename):
-  global identifiers, checkpoints
-
   try:
     lines = open(filename, 'r').readlines()
     if len(lines) == 0:
@@ -49,28 +51,25 @@ def readFile(filename):
     print('Error: no such file \'' + sys.argv[1] + '\' or empty')
     exit()
   #Foreach line read, parse it and update data structures
-  for line_number, line in enumerate(lines):
+  for line_number, line in enumerate(lines[1:]):
     match = re.match(pattern, line, flags=0)
     if match:
-      parseMatch(match, line_number)
+        parseMatch(match, line_number)
     else:
       print("Error while parsing line " + str(line_number) + ": " + line)
-      print("Is it compliant with the format <filename>,<line_of_code>:<timestamp> ?")
+      print("Is it compliant with the format <file>,<line_of_code>,<checkpoint_name>,<timestamp> ?\n")
+      showUsage()
       exit()
-
-  #Add Checkpoint identifier incrementally calculated.
-  #Useful when more Checkpoints/Storepoints in the same Line of code and file
-  for count, id in enumerate(identifiers):
-    checkpoints[count] += "," + str(id)
 
 #Function to print script usage
 def showUsage():
-  print("compute.py <filename> [<FLAGS>]")
+  print("profiler_parser.py <filename> [<FLAGS>]")
   print("\t-h/--help: show the usage menu")
-  print("\t-s/--show-all: show also duration between checkpoints")
+  print("\t-s/--statistics: show only general statistics")
+  print("\t-e/--export: export in csv format")
 
 def main():
-  global checkpoints, duration
+  global data
 
   #Checking arguments
   if len(sys.argv) == 1 or sys.argv[1] == "-h" or sys.argv[1] == "--help":
@@ -78,15 +77,34 @@ def main():
     exit()
 
   readFile(sys.argv[1])
+
+  #Checking export flag
+  if len(sys.argv) == 3 and (sys.argv[2] == "--export" or sys.argv[2] == "-e"):
+    filename = sys.argv[1][:sys.argv[1].rfind('.')]+".csv"
+    with open(filename, 'w') as out:
+      csv_out=csv.writer(out)
+      csv_out.writerow(["File", "Line", "Name", "LoopId", "Timestamp(ns)", "Duration(ns)"])
+      for row in data:
+        csv_out.writerow(row)
+    print("CSV exported at `" + filename + "`")
+    exit()
+
   #Checking whether to display all point-to-point distances or not
-  if len(sys.argv) >= 3 and (sys.argv[2] == "--show-all" or sys.argv[2] == "-s"):
-    for count, item in enumerate(checkpoints[:-1]):
-      print("Checkpoint(" + item + ") to Checkpoint(" + checkpoints[count+1] + "): " + str(duration[count]) + " ns")
+  if len(sys.argv) == 2 or (len(sys.argv) == 3 and not (sys.argv[2] == "--statistics" or sys.argv[2] == "-s")):
+    print("="*padding*3 + "="*6)
+    print("||" + "FROM".ljust(padding) + "|" + "TO".ljust(padding) + "|" + "TIME(ns)".ljust(padding) + "||")
+    print("="*padding*3 + "="*6)
+    for count, item in enumerate(data[:-1]):
+      name1 = item[2] if item[2] != "" else item[0] + "," +str(item[1])
+      name2 = data[count+1][2] if data[count+1][2] != "" else data[count+1][0] + "," + str(data[count+1][1])
+      print("||" + name1.ljust(padding) + "|" + name2.ljust(padding) + "|" + str(data[count+1][5]).ljust(padding) + "||")
+    print("="*padding*3 + "="*6)
 
   #Printing statistics
+  duration = [item[5] for item in data[1:]]
   print("Max execution time: " + str(max(duration)) + " ns")
   print("Min execution time: " + str(min(duration)) + " ns")
   print("Avg execution time: " + str(sum(duration)/len(duration)) + " ns")
 
 if __name__== '__main__':
-  main()
+    main()

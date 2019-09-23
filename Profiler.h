@@ -22,8 +22,8 @@
 #define PROFILER_EXTENSION ".log"
 
 
-#define CHECKPOINT Profiler::getInstance().tick(__FILE__, __LINE__);
-#define STOREPOINT {CHECKPOINT Profiler::getInstance().store();}
+#define CHECKPOINT(...) Profiler::getInstance().tick(__FILE__, __LINE__, ##__VA_ARGS__);
+#define STOREPOINT(...) {CHECKPOINT(__VA_ARGS__) Profiler::getInstance().store();}
 
 
 /***
@@ -36,7 +36,7 @@ private:
     Profiler();
 
     ///Support data structure
-    std::vector<std::pair<std::pair<const char *, unsigned>, std::chrono::high_resolution_clock::time_point>> results;
+    std::vector<std::pair<std::pair<const char *, unsigned>, std::pair<const char *, std::chrono::high_resolution_clock::time_point>>> results;
 
     ///Final filename calculate at execution time
     std::string output_file;
@@ -44,10 +44,11 @@ private:
 public:
     /**
      * Function to be called before the `objective function` execution to store the initial timestamp
-     * @param filename: the name of the file containing the checkpoint
+     * @param file: the name of the file containing the checkpoint
      * @param request : checkpoint number
      */
-    void tick(const char *filename = "", unsigned line_number = 0);
+    void tick(const char *file = "", unsigned line = 0,
+              const char *checkpoint_name = "");
 
     ///Function called to store gathered data into a file
     void store();
@@ -69,9 +70,14 @@ inline Profiler::Profiler() {
           << ltm->tm_mon << std::setfill('0') << std::setw(2)
           << ltm->tm_mday << "_" << std::setfill('0') << std::setw(2)
           << ltm->tm_hour << std::setfill('0') << std::setw(2)
-          <<ltm->tm_min << std::setfill('0') << std::setw(2)
+          << ltm->tm_min << std::setfill('0') << std::setw(2)
           << ltm->tm_sec << PROFILER_EXTENSION).str();
 
+  std::ofstream os;
+  os.open(output_file, std::ios::app);
+  os << "File, Line, Checkpoint Name, Timestamp" << std::endl;
+  os.close();
+  
   for (int i = 0; i < WARM_UP; i++) {
     tick();
   }
@@ -79,18 +85,25 @@ inline Profiler::Profiler() {
 }
 
 inline void Profiler::store() {
-  std::ofstream outputFile;
-  outputFile.open(output_file, std::ios::app);
-  std::for_each(results.begin(), results.end(), [this, &outputFile](auto &res) -> void {
-      outputFile << res.first.first << "," << res.first.second << ":" << res.second.time_since_epoch().count() << std::endl;
-  });
-  outputFile.close();
+  std::ofstream os;
+  os.open(output_file, std::ios::app);
+  std::for_each(results.begin(), results.end(),
+                [&os](auto &res) -> void {
+                    os << res.first.first << "," << res.first.second
+                               << "," << res.second.first << ","
+                               << res.second.second.time_since_epoch().count()
+                               << std::endl;
+                });
+  os.close();
   results.clear();
 }
 
-inline void Profiler::tick(const char *filename, unsigned line_number) {
+inline void Profiler::tick(const char *file, unsigned line,
+                           const char *checkpoint_name) {
   results.emplace_back(
-          std::make_pair(std::make_pair(filename, line_number), std::chrono::high_resolution_clock::now()));
+          std::make_pair(std::make_pair(file, line),
+                         std::make_pair(checkpoint_name,
+                                        std::chrono::high_resolution_clock::now())));
 }
 
 
@@ -98,7 +111,7 @@ inline void Profiler::tick(const char *filename, unsigned line_number) {
 
 #else
 
-#define CHECKPOINT
-#define STOREPOINT
+#define CHECKPOINT(...)
+#define STOREPOINT(...)
 
 #endif //PROFILER
